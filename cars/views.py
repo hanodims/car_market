@@ -1,6 +1,8 @@
 from django.shortcuts import render,redirect
 from .models import Car
 from .forms import CarForm
+from django.contrib import messages
+
 
 def car_list(request):
 	cars = Car.objects.all()
@@ -24,6 +26,7 @@ def car_create(request):
 		form = CarForm(request.POST, request.FILES)
 		if form.is_valid():
 			form.save()
+			messages.success(request, 'Car is created.')
 			return redirect('car-list')
 	context = {
 		"form":form,
@@ -32,21 +35,23 @@ def car_create(request):
 
 
 def car_update(request, car_id):
-    car_obj = Car.objects.get(id=car_id)
-    form = CarForm(instance=car_obj)
-    if request.method == "POST":
-        form = CarForm(request.POST, request.FILES, instance=car_obj)
-        if form.is_valid():
-            form.save()
-            return redirect('car-list')
-    context = {
-        "car_obj": car_obj,
-        "form":form,
-    }
-    return render(request, 'update.html', context)
+	car_obj = Car.objects.get(id=car_id)
+	form = CarForm(instance=car_obj)
+	if request.method == "POST":
+		form = CarForm(request.POST, request.FILES, instance=car_obj)
+		if form.is_valid():
+			form.save()
+			messages.info(request, 'Car is updated.')
+			return redirect('car-list')
+	context = {
+		"car_obj": car_obj,
+		"form":form,
+	}
+	return render(request, 'update.html', context)
 
 
 def car_delete(request, car_id):
-    car_obj = Car.objects.get(id=car_id)
-    car_obj.delete()
-    return redirect('car-list')
+	car_obj = Car.objects.get(id=car_id)
+	car_obj.delete()
+	messages.warning(request, 'Car is deleated.')
+	return redirect('car-list')
